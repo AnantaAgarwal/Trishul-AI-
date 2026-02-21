@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TRISHUL AI — Main Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="scanlines"></div>
+  <canvas id="grid-canvas"></canvas>
+  <div class="particles" id="particles"></div>
+
+  <div class="hud-frame">
+
+    <!-- TOP NAV BAR -->
+    <div class="top-bar">
+      <div class="top-left">
+        <span class="blink-dot"></span>
+        <span class="mono">TIME: <span id="clock">--:--:-- IST</span></span>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">HOME</a>
+        <a href="dashboard.html" class="nav-link active">DASHBOARD</a>
+        <a href="threatmap.html" class="nav-link">THREAT MAP</a>
+        <a href="pce.html" class="nav-link">PCE ENGINE</a>
+      </nav>
+      <div class="top-right">
+        <span class="mono small green">SYSTEM: ONLINE</span>
+        <span class="blink-dot green-dot"></span>
+      </div>
+    </div>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <!-- PAGE TITLE -->
+   
+    <div class="page-header">
+      <div class="page-title">OPERATIONAL DASHBOARD</div>
+      <div class="page-subtitle mono small">REAL-TIME MULTI-DOMAIN THREAT MONITORING // 3-PRONGED COVERAGE ACTIVE</div>
+    </div>
+
+    <!-- GLOBAL STATS BAR -->
+    <div class="global-stats">
+      <div class="gstat">
+        <div class="gstat-label">SYSTEM INTEGRITY</div>
+        <div class="gstat-value green" id="integrity">98.7%</div>
+      </div>
+      <div class="gstat-divider"></div>
+      <div class="gstat">
+        <div class="gstat-label">ACTIVE THREATS</div>
+        <div class="gstat-value red" id="active-threats">3</div>
+      </div>
+      <div class="gstat-divider"></div>
+      <div class="gstat">
+        <div class="gstat-label">AI PREDICTIONS TODAY</div>
+        <div class="gstat-value cyan">1,247</div>
+      </div>
+      <div class="gstat-divider"></div>
+      <div class="gstat">
+        <div class="gstat-label">THREATS NEUTRALIZED</div>
+        <div class="gstat-value green">41</div>
+      </div>
+      <div class="gstat-divider"></div>
+      <div class="gstat">
+        <div class="gstat-label">RESPONSE LATENCY</div>
+        <div class="gstat-value cyan">&lt;5ms</div>
+      </div>
+      <div class="gstat-divider"></div>
+      <div class="gstat">
+        <div class="gstat-label">DATA VELOCITY</div>
+        <div class="gstat-value cyan">10 Gbit/s</div>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+    <!-- 3 DOMAIN PANELS -->
+    <div class="domains-grid">
+
+      <!-- ===== AIR DEFENSE ===== -->
+      <div class="domain-panel air-panel stretch-panel">
+        <div class="domain-header">
+          <div class="domain-icon">✈</div>
+          <div>
+            <div class="domain-title">AIR DEFENSE</div>
+            <div class="domain-status engaged">● ENGAGED // THREAT LEVEL: HIGH</div>
+          </div>
+          <div class="domain-alert-badge red-badge">!</div>
+        </div>
+
+        <canvas class="radar-canvas" id="air-radar" ></canvas>
+
+        <div class="domain-stats">
+          <div class="ds-row"><span class="ds-label">OBJECTS TRACKED</span><span class="ds-val red">7</span></div>
+          <div class="ds-row"><span class="ds-label">SWARM DETECTED</span><span class="ds-val red blink-text">YES</span></div>
+          <div class="ds-row"><span class="ds-label">INTERCEPT READY</span><span class="ds-val green">STANDBY</span></div>
+          <div class="ds-row"><span class="ds-label">RADAR COVERAGE</span><span class="ds-val cyan">360°</span></div>
+        </div>
+
+        <div class="threat-log" id="air-log">
+          <div class="log-title">THREAT LOG</div>
+          <div class="log-entry red">⚠ SWARM ASSAULT DETECTED — SECTOR NW-4</div>
+          <div class="log-entry orange">▶ TRAJECTORY ANALYSIS IN PROGRESS...</div>
+          <div class="log-entry cyan">✔ INTERCEPT VECTOR CALCULATED</div>
+        </div>
+
+        <div class="domain-actions">
+          <button class="action-btn red-btn" onclick="triggerAction('air','DEPLOY INTERCEPTORS')">DEPLOY INTERCEPTORS</button>
+          <button class="action-btn" onclick="triggerAction('air','TRACK & MONITOR')">TRACK & MONITOR</button>
+        </div>
+      </div>
+
+      <!-- ===== CYBER SECURITY ===== -->
+      <div class="domain-panel cyber-panel stretch-panel">
+        <div class="domain-header">
+          <div class="domain-icon">🔒</div>
+          <div>
+            <div class="domain-title">CYBER SECURITY</div>
+            <div class="domain-status compromised">● COMPROMISED // LATENCY: CRITICAL</div>
+          </div>
+          <div class="domain-alert-badge red-badge blink-text">!!</div>
+        </div>
+
+        <canvas class="radar-canvas" id="cyber-radar" ></canvas>
+
+        <div class="domain-stats">
+          <div class="ds-row"><span class="ds-label">INTRUSIONS DETECTED</span><span class="ds-val red">2</span></div>
+          <div class="ds-row"><span class="ds-label">SECTOR BREACHED</span><span class="ds-val red">SECTOR 7</span></div>
+          <div class="ds-row"><span class="ds-label">FIREWALL STATUS</span><span class="ds-val orange">STRESSED</span></div>
+          <div class="ds-row"><span class="ds-label">DATA INTEGRITY</span><span class="ds-val orange">94.2%</span></div>
+        </div>
+
+        <div class="threat-log" id="cyber-log">
+          <div class="log-title">THREAT LOG</div>
+          <div class="log-entry red">⚠ INFRASTRUCTURE BREACH — SECTOR 7</div>
+          <div class="log-entry red">⚠ UNAUTHORISED ACCESS — NODE C-14</div>
+          <div class="log-entry orange">▶ ISOLATING COMPROMISED NODES...</div>
+        </div>
+
+        <div class="domain-actions">
+          <button class="action-btn red-btn" onclick="triggerAction('cyber','ISOLATE NODES')">ISOLATE NODES</button>
+          <button class="action-btn" onclick="triggerAction('cyber','TRACE ORIGIN')">TRACE ORIGIN</button>
+        </div>
+      </div>
+
+      <!-- ===== ELECTRONIC WARFARE ===== -->
+      <div class="domain-panel ew-panel stretch-panel">
+        <div class="domain-header">
+          <div class="domain-icon">📡</div>
+          <div>
+            <div class="domain-title">ELECTRONIC WARFARE</div>
+            <div class="domain-status jammed">● JAMMED // SIGNAL INTEGRITY: ZERO</div>
+          </div>
+          <div class="domain-alert-badge orange-badge">⚠</div>
+        </div>
+
+        <canvas class="radar-canvas" id="ew-radar" ></canvas>
+
+        <div class="domain-stats">
+          <div class="ds-row"><span class="ds-label">SPECTRUM STATUS</span><span class="ds-val red blink-text">JAMMED</span></div>
+          <div class="ds-row"><span class="ds-label">SIGNAL INTEGRITY</span><span class="ds-val red">0%</span></div>
+          <div class="ds-row"><span class="ds-label">RE-ROUTING</span><span class="ds-val orange blink-text">ACTIVE</span></div>
+          <div class="ds-row"><span class="ds-label">BACKUP FREQ.</span><span class="ds-val cyan">ONLINE</span></div>
+        </div>
+
+        <div class="threat-log" id="ew-log">
+          <div class="log-title">THREAT LOG</div>
+          <div class="log-entry red">⚠ SPECTRUM JAMMING DETECTED — BAND 3.5GHz</div>
+          <div class="log-entry orange">▶ SIGNAL RE-ROUTING IN PROGRESS</div>
+          <div class="log-entry cyan">✔ BACKUP FREQUENCY ACTIVATED</div>
+        </div>
+
+        <div class="domain-actions">
+          <button class="action-btn red-btn" onclick="triggerAction('ew','DEPLOY JAMMERS')">DEPLOY JAMMERS</button>
+          <button class="action-btn" onclick="triggerAction('ew','REROUTE SIGNAL')">REROUTE SIGNAL</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- OPERATIONAL FLOW BAR -->
+    <div class="op-flow-bar">
+      <div class="flow-step done">
+        <div class="flow-icon">📡</div>
+        <div class="flow-label">DATA COLLECTION</div>
+        <div class="flow-sub">Sensors · Logs</div>
+      </div>
+      <div class="flow-arrow">▶</div>
+      <div class="flow-step done">
+        <div class="flow-icon">🧠</div>
+        <div class="flow-label">AI ANALYSIS</div>
+        <div class="flow-sub">Pattern Detection</div>
+      </div>
+      <div class="flow-arrow">▶</div>
+      <div class="flow-step active">
+        <div class="flow-icon">🎯</div>
+        <div class="flow-label">PREDICTION</div>
+        <div class="flow-sub">Probability Est.</div>
+      </div>
+      <div class="flow-arrow">▶</div>
+      <div class="flow-step pending">
+        <div class="flow-icon">📊</div>
+        <div class="flow-label">XAI OUTPUT</div>
+        <div class="flow-sub">Risk Heatmaps</div>
+      </div>
+      <div class="flow-arrow">▶</div>
+      <div class="flow-step pending">
+        <div class="flow-icon">🛡️</div>
+        <div class="flow-label">PREVENTION</div>
+        <div class="flow-sub">Counter-Measure</div>
+      </div>
+    </div>
+</div>
+    
+
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <div class="mono small">TIME: <span id="clock2">--:--:-- IST</span></div>
+      <div class="domain-badges">
+        <span class="badge green-badge-sm">✈ AIR: ENGAGED</span>
+        <span class="badge red-badge-sm">🔒 CYBER: COMPROMISED</span>
+        <span class="badge orange-badge-sm">📡 EW: JAMMED</span>
+      </div>
+      <div class="mono small">TRISHUL AI © TEAM 2BYTES 2025</div>
+    </div>
+
+    <!-- ACTION TOAST -->
+    <div class="action-toast" id="action-toast"></div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

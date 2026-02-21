@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRISHUL AI — Threat Map</title>
+
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="dashboard.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+<style>
+.map-wrapper{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 260px;
+  gap:10px;
+  padding:0 8px;
+  overflow:hidden;
+  min-height:0;
+}
+
+.map-area{
+  position:relative;
+  background:rgba(0,5,12,0.95);
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+#india-canvas{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.map-title{
+  position:absolute;
+  top:12px;
+  left:12px;
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  color:var(--cyan);
+  letter-spacing:0.15em;
+}
+
+.map-bottom{
+  position:absolute;
+  bottom:10px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+  gap:24px;
+}
+
+.map-stat{
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.62rem;
+  color:#7aaabb;
+}
+
+.map-stat span{
+  color:var(--green);
+}
+
+sidebar{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow-y:auto;
+}
+
+.t-panel{
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+  padding:12px;
+  backdrop-filter:blur(6px);
+}
+
+.t-title{
+  font-family:'Orbitron',monospace;
+  font-size:0.6rem;
+  color:var(--cyan);
+  letter-spacing:0.15em;
+  margin-bottom:8px;
+}
+
+.t-entry{
+  padding:8px;
+  border:1px solid rgba(255,34,68,0.25);
+  background:rgba(40,0,10,0.5);
+  margin-bottom:6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+}
+
+.t-head{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:4px;
+}
+
+.t-name{color:#fff;}
+.t-conf{
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  font-weight:700;
+}
+
+.analysis-box{
+  margin-top:10px;
+  padding:10px;
+  border:1px solid rgba(0,229,255,0.3);
+  background:rgba(0,20,35,0.6);
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+  min-height:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="scanlines"></div>
+<canvas id="grid-canvas"></canvas>
+<div class="particles" id="particles"></div>
+
+<div class="hud-frame">
+
+<div class="top-bar">
+  <div class="top-left">
+    <span class="blink-dot"></span>
+    <span class="mono">TRISHUL AI // LIVE THREAT MAP</span>
+  </div>
+  <div class="top-right">
+    <span class="mono small">TIME: <span id="clock">--:--:--</span> IST</span>
+  </div>
+</div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="map-wrapper">
+
+<div class="map-area">
+  <canvas id="india-canvas"></canvas>
+  <div class="map-title">LIVE GEOSPATIAL THREAT VISUALIZATION</div>
+
+  <div class="map-bottom">
+    <div class="map-stat">SYSTEM INTEGRITY: <span>100%</span></div>
+    <div class="map-stat">NETWORK: <span>SECURE</span></div>
+    <div class="map-stat">THREATS: <span id="active-count">2 ACTIVE</span></div>
+  </div>
+</div>
+
+<div class="threat-sidebar">
+  <div class="t-panel">
+    <div class="t-title">THREAT ANALYSIS</div>
+    <div id="analysis-output" class="analysis-box">
+      CLICK A THREAT VECTOR TO VIEW ANALYSIS.
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="mono small">TRISHUL AI // TEAM 2BYTES</div>
+  <div class="mono small red blink-text">⚠ ACTIVE DEFENSE MODE</div>
+</div>
+
+</div>
+
+
+
+<script>
+// Clock
+function updateClock(){
+  const now=new Date();
+  const t=[now.getHours(),now.getMinutes(),now.getSeconds()]
+  .map(v=>String(v).padStart(2,'0')).join(':');
+  document.getElementById('clock').textContent=t;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+const canvas=document.getElementById('india-canvas');
+const ctx=canvas.getContext('2d');
+
+function resize(){
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+}
+resize();
+window.addEventListener('resize',resize);
+
+const cities=[
+  [0.48,0.22,'DELHI'],
+  [0.32,0.58,'MUMBAI']
+];
+
+let threats=[
+  {start:[0.05,0.08],target:0,color:'#ff2244',name:'DRONE SWARM',confidence:98},
+  {start:[0.02,0.65],target:1,color:'#ff2244',name:'CYBER BREACH',confidence:94}
+];
+
+let progress=[0,0.4];
+let pulseTime=0;
+
+function updateThreatCount(){
+  document.getElementById("active-count").textContent=
+  threats.length+" ACTIVE";
+}
+updateThreatCount();
+
+function draw(){
+  const w=canvas.width;
+  const h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  ctx.fillStyle='rgba(0,8,18,0.95)';
+  ctx.fillRect(0,0,w,h);
+
+  const mx=w*0.1,my=h*0.05;
+  const mw=w*0.7,mh=h*0.9;
+
+  // Cities
+  cities.forEach(c=>{
+    const x=mx+c[0]*mw;
+    const y=my+c[1]*mh;
+    ctx.beginPath();
+    ctx.arc(x,y,6,0,Math.PI*2);
+    ctx.fillStyle='#00e5ff';
+    ctx.shadowColor='#00e5ff';
+    ctx.shadowBlur=10;
+    ctx.fill();
+    ctx.shadowBlur=0;
+  });
+
+  // Threat vectors
+  threats.forEach((t,i)=>{
+    progress[i]=(progress[i]+0.002)%1;
+
+    const sx=t.start[0]*w;
+    const sy=t.start[1]*h;
+    const target=cities[t.target];
+    const ex=mx+target[0]*mw;
+    const ey=my+target[1]*mh;
+
+    ctx.strokeStyle=t.color;
+    ctx.globalAlpha=0.4;
+    ctx.beginPath();
+    ctx.moveTo(sx,sy);
+    ctx.lineTo(ex,ey);
+    ctx.stroke();
+    ctx.globalAlpha=1;
+
+    const cx=sx+(ex-sx)*progress[i];
+    const cy=sy+(ey-sy)*progress[i];
+
+    ctx.beginPath();
+    ctx.arc(cx,cy,5,0,Math.PI*2);
+    ctx.fillStyle=t.color;
+    ctx.shadowColor=t.color;
+    ctx.shadowBlur=15;
+    ctx.fill();
+    ctx.shadowBlur=0;
+  });
+
+  pulseTime+=0.03;
+  requestAnimationFrame(draw);
+}
+draw();
+
+// Threat click interaction
+canvas.addEventListener("click",(e)=>{
+  const rect=canvas.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  const y=e.clientY-rect.top;
+
+  threats.forEach((t,i)=>{
+    const target=cities[t.target];
+    const mx=canvas.width*0.1;
+    const my=canvas.height*0.05;
+    const mw=canvas.width*0.7;
+    const mh=canvas.height*0.9;
+    const ex=mx+target[0]*mw;
+    const ey=my+target[1]*mh;
+
+    if(Math.hypot(x-ex,y-ey)<20){
+      document.getElementById("analysis-output").innerHTML=
+      "THREAT: "+t.name+"<br>"+
+      "CONFIDENCE: "+t.confidence+"%<br>"+
+      "IMPACT ZONE: "+cities[t.target][2]+"<br>"+
+      "RECOMMENDED ACTION: DEPLOY COUNTERMEASURES";
+    }
+  });
+});
+
+// Simulate escalation
+setInterval(()=>{
+  threats.push({
+    start:[Math.random()*0.1,Math.random()],
+    target:0,
+    color:'#ffaa00',
+    name:'NEW VECTOR',
+    confidence:87
+  });
+  progress.push(Math.random());
+  updateThreatCount();
+},20000);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TRISHUL AI — India's Predictive Defense Shield</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Scanline overlay -->
+  <div class="scanlines"></div>
+
+  <!-- Animated grid background -->
+  <canvas id="grid-canvas"></canvas>
+
+  <!-- Particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Main container -->
+  <div class="hud-frame">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="top-left">
+        <span class="blink-dot"></span>
+        <span class="mono">TIME: <span id="clock">--:--:-- IST</span></span>
+      </div>
+      <div class="top-center mono">[ TACTICAL DEFENSE INTERFACE v4.7 ]</div>
+      <div class="top-right">
+        <span class="mono">SECURE</span>
+        <span class="lock-icon">🔒</span>
+        <span class="signal-bars">▮▮▮▮</span>
+      </div>
+    </div>
+
+    <!-- Corner brackets -->
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <!-- CENTER CONTENT -->
+    <div class="center-content">
+
+      <!-- Left panel -->
+      <div class="side-panel left-panel">
+        <div class="panel-box alert-box">
+          <div class="panel-title">SYSTEM STATUS</div>
+          <div class="stat-row">
+            <span class="stat-label">SYSTEM INTEGRITY</span>
+            <span class="stat-value green">98.7%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">THREAT DETECTION</span>
+            <span class="stat-value green blink-text">ACTIVE</span>
+          </div>
+          <div class="divider"></div>
+          <div class="alert-item red">
+            <span class="alert-icon">⚠</span>
+            <div>
+              <div class="alert-title">ALERT:</div>
+              <div class="alert-msg">CYBER INTRUSION DETECTED — SECTOR 7</div>
+            </div>
+          </div>
+          <div class="alert-item red">
+            <span class="alert-icon">⚠</span>
+            <div>
+              <div class="alert-title">THREAT LEVEL: <span class="red">HIGH</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-box warning-box">
+          <div class="warning-header">⚠ WARNING AMBER</div>
+          <div class="warning-body">INTERFERENCE:<br/>
+            <span class="orange">SIGNAL DISRUPTION IN PROGRESS — RE-ROUTING</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center logo + title -->
+      <div class="logo-area">
+        <div class="title-glow">TRISHUL AI</div>
+        <div class="subtitle">INDIA'S MULTI-LAYERED PREDICTIVE DEFENSE SHIELD</div>
+
+        <!-- SVG Trishul -->
+        <div class="trishul-wrapper">
+          <svg class="trishul-svg" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+            <!-- Glow filter -->
+            <defs>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <filter id="glow-strong">
+                <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Handle -->
+            <rect x="96" y="200" width="8" height="100" fill="#00e5ff" filter="url(#glow)" rx="2"/>
+            <!-- Base knob -->
+            <ellipse cx="100" cy="300" rx="14" ry="6" fill="#00e5ff" filter="url(#glow)"/>
+            <!-- Middle knob -->
+            <ellipse cx="100" cy="210" rx="10" ry="5" fill="#00e5ff" filter="url(#glow)"/>
+
+            <!-- Center prong -->
+            <polygon points="100,30 108,130 92,130" fill="#00e5ff" filter="url(#glow-strong)"/>
+            <!-- Center tip sharp -->
+            <polygon points="100,10 104,40 96,40" fill="#ffffff" filter="url(#glow-strong)"/>
+
+            <!-- Left prong -->
+            <path d="M92,120 Q60,100 45,70 Q40,55 50,50 Q58,48 65,65 Q75,90 90,110" fill="#00e5ff" filter="url(#glow)"/>
+            <!-- Left tip -->
+            <polygon points="47,48 55,62 40,58" fill="#ffffff" filter="url(#glow)"/>
+
+            <!-- Right prong -->
+            <path d="M108,120 Q140,100 155,70 Q160,55 150,50 Q142,48 135,65 Q125,90 110,110" fill="#00e5ff" filter="url(#glow)"/>
+            <!-- Right tip -->
+            <polygon points="153,48 145,62 160,58" fill="#ffffff" filter="url(#glow)"/>
+
+            <!-- Center gem -->
+            <circle cx="100" cy="150" r="6" fill="#00e5ff" filter="url(#glow-strong)" class="pulse-circle"/>
+          </svg>
+
+          <!-- Orbital rings -->
+          <div class="orbit-ring ring1"></div>
+          <div class="orbit-ring ring2"></div>
+        </div>
+
+        <!-- Operator info -->
+        <div class="operator-box">
+          <div class="mono small">SYSTEM ACCESS: TEAM 2BYTES</div>
+          <div class="mono small">OPERATORS: ANANTA AGARWAL // SHIVIKA TANDON</div>
+          <div class="mono small">STATUS: <span class="green blink-text">ONLINE</span></div>
+        </div>
+
+        <!-- Enter button -->
+        <button class="enter-btn" onclick="enterSystem()">
+          <span class="btn-text">[ INITIALIZE SYSTEM ]</span>
+          <span class="btn-glow"></span>
+        </button>
+      </div>
+
+      <!-- Right panel -->
+      <div class="side-panel right-panel">
+        <div class="panel-box">
+          <div class="panel-title">SHIELD STATUS</div>
+          <div class="stat-row">
+            <span class="stat-label">PREDICTIVE SHIELD</span>
+            <span class="stat-value green blink-text">ONLINE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">RESPONSE TIME</span>
+            <span class="stat-value cyan">&lt;0.01MS</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">AI STATUS</span>
+            <span class="stat-value green">OPTIMAL</span>
+          </div>
+        </div>
+
+        <div class="panel-box neural-box">
+          <div class="panel-title">NEURAL NETWORK</div>
+          <canvas id="neural-canvas" width="200" height="100"></canvas>
+          <div class="stat-row" style="margin-top:8px">
+            <span class="stat-label">STATUS</span>
+            <span class="stat-value cyan">EXPANDING</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="bottom-bar">
+      <div class="mono small">TIME: <span id="clock2">--:--:-- IST</span></div>
+      <div class="domain-badges">
+        <span class="badge">✈ AIR DEFENSE</span>
+        <span class="badge">🔒 CYBER SECURITY</span>
+        <span class="badge">📡 ELECTRONIC WARFARE</span>
+      </div>
+      <div class="mono small">TRISHUL AI © TEAM 2BYTES 2025</div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

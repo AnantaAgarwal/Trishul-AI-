@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRISHUL AI — Predictive Consequence Engine</title>
+
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="dashboard.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+<style>
+.pce-wrapper{
+  flex:1;
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:12px;
+  padding:0 10px;
+  min-height:0;
+}
+
+.pce-left{
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+  padding:15px;
+}
+
+.pce-right{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.section-title{
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  color:var(--cyan);
+  letter-spacing:0.15em;
+  margin-bottom:10px;
+}
+
+.threat-option{
+  padding:10px;
+  border:1px solid rgba(0,229,255,0.2);
+  margin-bottom:8px;
+  cursor:pointer;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.65rem;
+  transition:0.3s;
+}
+
+.threat-option:hover{
+  background:rgba(0,229,255,0.08);
+}
+
+.threat-option.active{
+  border-color:var(--cyan);
+  box-shadow:0 0 10px rgba(0,229,255,0.3);
+}
+
+.simulation-panel{
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+  padding:15px;
+}
+
+.scenario-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.scenario-box{
+  border:1px solid rgba(0,229,255,0.2);
+  padding:10px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+  background:rgba(0,10,20,0.6);
+  transition:0.3s;
+}
+
+.scenario-box.best{
+  border-color:var(--green);
+  box-shadow:0 0 12px rgba(0,255,136,0.4);
+}
+
+.metric{
+  margin-bottom:6px;
+}
+
+.metric strong{
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+}
+
+.ai-reason{
+  margin-top:12px;
+  padding:10px;
+  border:1px solid rgba(0,229,255,0.25);
+  background:rgba(0,20,35,0.6);
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+  line-height:1.5;
+}
+
+.run-btn{
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="scanlines"></div>
+<canvas id="grid-canvas"></canvas>
+<div class="particles" id="particles"></div>
+
+<div class="hud-frame">
+
+<div class="top-bar">
+  <div class="top-left">
+    <span class="blink-dot"></span>
+    <span class="mono">TRISHUL AI // PREDICTIVE CONSEQUENCE ENGINE</span>
+  </div>
+  <div class="top-right">
+    <span class="mono small">TIME: <span id="clock">--:--:--</span> IST</span>
+  </div>
+</div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="pce-wrapper">
+
+<!-- LEFT PANEL -->
+<div class="pce-left">
+  <div class="section-title">SELECT ACTIVE THREAT</div>
+
+  <div class="threat-option active" onclick="selectThreat(0)">
+    THREAT-01 [AIR]<br>
+    Drone Swarm — Delhi Sector
+  </div>
+
+  <div class="threat-option" onclick="selectThreat(1)">
+    THREAT-02 [CYBER]<br>
+    SQL Injection — Sector 7
+  </div>
+
+  <div class="threat-option" onclick="selectThreat(2)">
+    THREAT-03 [EW]<br>
+    Spectrum Jamming — Band 3
+  </div>
+
+  <button class="action-btn red-btn run-btn" onclick="runSimulation()">
+    RUN WHAT-IF ANALYSIS
+  </button>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="pce-right">
+
+<div class="simulation-panel">
+  <div class="section-title">SIMULATION OUTPUT</div>
+
+  <div id="scenario-container" class="scenario-grid">
+    <!-- Scenarios will render here -->
+  </div>
+
+  <div id="ai-reasoning" class="ai-reason">
+    Awaiting simulation input.
+  </div>
+
+</div>
+
+</div>
+</div>
+
+<div class="bottom-bar">
+  <div class="mono small">AI MULTI-SCENARIO ENGINE ACTIVE</div>
+  <div class="mono small cyan">STRATEGIC DECISION SUPPORT ENABLED</div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+// Clock
+function updateClock(){
+  const now=new Date();
+  const t=[now.getHours(),now.getMinutes(),now.getSeconds()]
+  .map(v=>String(v).padStart(2,'0')).join(':');
+  document.getElementById('clock').textContent=t;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+let currentThreat=0;
+
+function selectThreat(index){
+  currentThreat=index;
+  document.querySelectorAll('.threat-option')
+  .forEach((el,i)=>el.classList.toggle('active',i===index));
+}
+
+function runSimulation(){
+
+  const scenarios=[
+    {name:"JAM IMMEDIATELY"},
+    {name:"WAIT 2 MINUTES"},
+    {name:"ISOLATE NODE"}
+  ];
+
+  scenarios.forEach(s=>{
+    s.civilian=(5+Math.random()*30);
+    s.riskChange=(-70+Math.random()*80);
+    s.escalation=(5+Math.random()*60);
+  });
+
+  // Determine best
+  let best=scenarios[0];
+  scenarios.forEach(s=>{
+    const score=s.escalation+s.civilian-Math.abs(s.riskChange);
+    const bestScore=best.escalation+best.civilian-Math.abs(best.riskChange);
+    if(score<bestScore) best=s;
+  });
+
+  const container=document.getElementById("scenario-container");
+  container.innerHTML="";
+
+  scenarios.forEach(s=>{
+    const box=document.createElement("div");
+    box.className="scenario-box";
+    if(s===best) box.classList.add("best");
+
+    box.innerHTML=`
+      <strong>${s.name}</strong><br><br>
+      <div class="metric">Civilian Disruption: ${s.civilian.toFixed(1)}%</div>
+      <div class="metric">Risk Change: ${s.riskChange.toFixed(1)}%</div>
+      <div class="metric">Escalation Probability: ${s.escalation.toFixed(1)}%</div>
+      ${s===best?"<br><span style='color:#00ff88'>✔ SAFEST STRATEGY</span>":""}
+    `;
+    container.appendChild(box);
+  });
+
+  document.getElementById("ai-reasoning").innerHTML=
+  `<strong>AI REASONING:</strong><br>
+   Multi-factor evaluation suggests <span style="color:#00ff88">${best.name}</span>
+   minimizes escalation risk while maintaining optimal threat suppression.
+   Civilian collateral impact remains within acceptable thresholds.
+   AI Confidence: ${(90+Math.random()*5).toFixed(1)}%`;
+}
+</script>
+
+</body>
+</html>

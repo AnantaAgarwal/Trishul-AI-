@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRISHUL AI — Explainable Intelligence</title>
+
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="dashboard.css"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+<style>
+.xai-wrapper{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:12px;
+  padding:0 10px;
+}
+
+.xai-main{
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+  padding:15px;
+}
+
+.xai-side{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.section-title{
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  color:var(--cyan);
+  letter-spacing:0.15em;
+  margin-bottom:12px;
+}
+
+.factor-bar{
+  margin-bottom:12px;
+}
+
+.factor-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+  margin-bottom:4px;
+}
+
+.bar{
+  height:8px;
+  background:rgba(0,229,255,0.1);
+  border:1px solid rgba(0,229,255,0.2);
+  position:relative;
+}
+
+.bar-fill{
+  height:100%;
+  background:var(--cyan);
+  width:0%;
+  transition:1s ease;
+}
+
+.explain-text{
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.62rem;
+  line-height:1.6;
+  margin-top:12px;
+}
+
+.node-card{
+  padding:10px;
+  border:1px solid rgba(0,229,255,0.2);
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.6rem;
+}
+</style>
+</head>
+
+<body>
+
+<div class="scanlines"></div>
+<canvas id="grid-canvas"></canvas>
+<div class="particles" id="particles"></div>
+
+<div class="hud-frame">
+
+<div class="top-bar">
+  <div class="top-left">
+    <span class="blink-dot"></span>
+    <span class="mono">TRISHUL AI // EXPLAINABLE OUTPUT</span>
+  </div>
+  <div class="top-right">
+    <span class="mono small">TIME: <span id="clock">--:--:--</span> IST</span>
+  </div>
+</div>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="xai-wrapper">
+
+<div class="xai-main">
+  <div class="section-title">AI DECISION BREAKDOWN</div>
+
+  <div class="factor-bar">
+    <div class="factor-label">Threat Severity Weight</div>
+    <div class="bar"><div class="bar-fill" id="bar1"></div></div>
+  </div>
+
+  <div class="factor-bar">
+    <div class="factor-label">Civilian Risk Weight</div>
+    <div class="bar"><div class="bar-fill" id="bar2"></div></div>
+  </div>
+
+  <div class="factor-bar">
+    <div class="factor-label">Escalation Probability Weight</div>
+    <div class="bar"><div class="bar-fill" id="bar3"></div></div>
+  </div>
+
+  <div class="factor-bar">
+    <div class="factor-label">Infrastructure Stability Weight</div>
+    <div class="bar"><div class="bar-fill" id="bar4"></div></div>
+  </div>
+
+  <div class="explain-text" id="explain-text">
+    Awaiting simulation data...
+  </div>
+</div>
+
+<div class="xai-side">
+
+<div class="node-card">
+  <strong>Recommended Strategy:</strong><br>
+  ISOLATE NODE<br><br>
+  <span class="green">✔ Lowest Escalation Risk</span><br>
+  <span class="cyan">✔ Controlled Containment</span>
+</div>
+
+<div class="node-card">
+  AI CONFIDENCE<br>
+  <strong class="cyan" id="confidence-score">--%</strong>
+</div>
+
+</div>
+
+</div>
+
+<div class="bottom-bar">
+  <div class="mono small">MODEL TYPE: MULTI-FACTOR WEIGHTED ANALYSIS</div>
+  <div class="mono small cyan">TRANSPARENCY MODE ENABLED</div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+// Clock
+function updateClock(){
+  const now=new Date();
+  const t=[now.getHours(),now.getMinutes(),now.getSeconds()]
+  .map(v=>String(v).padStart(2,'0')).join(':');
+  document.getElementById('clock').textContent=t;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// Animate bars
+function runXAI(){
+
+  const values=[
+    80+Math.random()*15,
+    40+Math.random()*20,
+    30+Math.random()*20,
+    70+Math.random()*15
+  ];
+
+  values.forEach((v,i)=>{
+    document.getElementById("bar"+(i+1)).style.width=v+"%";
+  });
+
+  document.getElementById("confidence-score")
+  .innerText=(90+Math.random()*5).toFixed(1)+"%";
+
+  document.getElementById("explain-text").innerHTML=
+  "The AI model prioritizes containment over aggressive disruption. " +
+  "Isolation reduces lateral propagation probability by 62%, " +
+  "maintains infrastructure stability, and keeps civilian interference below acceptable thresholds. " +
+  "Escalation modeling indicates strategic containment minimizes long-term retaliation risk.";
+}
+
+setTimeout(runXAI,500);
+</script>
+
+</body>
+</html>
