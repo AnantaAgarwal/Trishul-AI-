@@ -1,7 +1,4 @@
-  // ===== TRISHUL AI — SCRIPT.JS =====
-
-// ===== CLOCK =====
-function updateClock() {
+  function updateClock() {
     const now = new Date();
     const h = String(now.getHours()).padStart(2, '0');
     const m = String(now.getMinutes()).padStart(2, '0');
@@ -13,7 +10,7 @@ function updateClock() {
   setInterval(updateClock, 1000);
   updateClock();
   
-  // ===== ANIMATED GRID CANVAS =====
+  
   const gridCanvas = document.getElementById('grid-canvas');
   const gctx = gridCanvas.getContext('2d');
   
@@ -32,7 +29,7 @@ function updateClock() {
     gctx.strokeStyle = 'rgba(0, 229, 255, 0.12)';
     gctx.lineWidth = 0.5;
   
-    // Vertical lines
+    
     for (let x = 0; x < gridCanvas.width; x += spacing) {
       gctx.beginPath();
       gctx.moveTo(x, 0);
@@ -40,7 +37,7 @@ function updateClock() {
       gctx.stroke();
     }
   
-    // Horizontal lines with perspective vanishing (bottom-weighted)
+    
     for (let y = 0; y < gridCanvas.height; y += spacing) {
       const alpha = 0.04 + (y / gridCanvas.height) * 0.2;
       gctx.strokeStyle = `rgba(0, 229, 255, ${alpha})`;
@@ -50,7 +47,7 @@ function updateClock() {
       gctx.stroke();
     }
   
-    // Glowing center cross
+    
     gctx.strokeStyle = 'rgba(0, 229, 255, 0.08)';
     gctx.lineWidth = 1;
     gctx.beginPath();
@@ -67,7 +64,7 @@ function updateClock() {
   }
   drawGrid();
   
-  // ===== PARTICLES =====
+
   const particleContainer = document.getElementById('particles');
   const NUM_PARTICLES = 40;
   
@@ -83,7 +80,7 @@ function updateClock() {
     particleContainer.appendChild(p);
   }
   
-  // ===== NEURAL NETWORK CANVAS =====
+  
   const neuralCanvas = document.getElementById('neural-canvas');
   const nctx = neuralCanvas.getContext('2d');
   
@@ -105,7 +102,7 @@ function updateClock() {
     nctx.fillStyle = 'rgba(0, 10, 20, 0.3)';
     nctx.fillRect(0, 0, neuralCanvas.width, neuralCanvas.height);
   
-    // Update positions
+    
     nodes.forEach(n => {
       n.x += n.vx;
       n.y += n.vy;
@@ -113,7 +110,7 @@ function updateClock() {
       if (n.y < 0 || n.y > neuralCanvas.height) n.vy *= -1;
     });
   
-    // Draw connections
+    
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const dx = nodes[i].x - nodes[j].x;
@@ -130,7 +127,7 @@ function updateClock() {
       }
     }
   
-    // Draw nodes
+  
     nodes.forEach(n => {
       nctx.beginPath();
       nctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
@@ -145,7 +142,7 @@ function updateClock() {
   }
   drawNeural();
   
-  // ===== RANDOM GLITCH EFFECT ON TITLE =====
+  
   const title = document.querySelector('.title-glow');
   const glitchChars = '!@#$%^&*<>?/\\|█▓▒░';
   
@@ -167,7 +164,7 @@ function updateClock() {
     if (Math.random() < 0.3) glitchTitle();
   }, 2500);
   
-  // ===== LIVE THREAT LOG TICKER =====
+  
   const threatMessages = [
     'SCANNING SECTOR 7... THREAT NEUTRALIZED',
     'AI PREDICTION ENGINE: NOMINAL',
@@ -190,8 +187,6 @@ function updateClock() {
     warningBody.innerHTML = `<span class="orange">${msg}</span>`;
   }, 3000);
   
-  // ===== ENTER BUTTON =====
-  // ===== ENTER BUTTON =====
  function enterSystem() {
 
     const btn = document.querySelector('.enter-btn');
@@ -199,33 +194,33 @@ function updateClock() {
     overlay.className = 'flash-overlay';
     document.body.appendChild(overlay);
   
-    // Step 1 — Authorizing
+    
     btn.innerHTML = '<span class="btn-text">[ AUTHORIZING ACCESS... ]</span>';
     btn.style.color = '#ffaa00';
     btn.style.borderColor = '#ffaa00';
   
     setTimeout(() => {
-      // Step 2 — Biometric
+      
       btn.innerHTML = '<span class="btn-text">[ BIOMETRIC VERIFIED ]</span>';
       btn.style.color = '#00e5ff';
       btn.style.borderColor = '#00e5ff';
     }, 700);
   
     setTimeout(() => {
-      // Step 3 — Access Granted
+      
       btn.innerHTML = '<span class="btn-text">[ ACCESS GRANTED ]</span>';
       btn.style.color = '#00ff88';
       btn.style.borderColor = '#00ff88';
     }, 1300);
   
     setTimeout(() => {
-      // Redirect to Dashboard
+      
       window.location.href = "dashboard.html";
     }, 2000);
   
   }
   
-  // ===== STAT VALUE FLUCTUATION (live feel) =====
+  
   setInterval(() => {
     const integrityEl = document.querySelector('.stat-value.green');
     if (integrityEl && integrityEl.textContent.includes('%')) {
@@ -235,7 +230,7 @@ function updateClock() {
     }
   }, 4000);
   
-  // ===== CONSOLE BOOT LOG (fun easter egg) =====
+  
   console.log('%c TRISHUL AI BOOT SEQUENCE ', 'background:#00e5ff;color:#000;font-weight:bold;font-size:14px;');
   console.log('%c System Integrity: 98.7% | Neural Network: EXPANDING | Shield: ONLINE ', 'color:#00e5ff;');
   console.log('%c Team 2Bytes | Ananta Agarwal & Shivika Tandon ', 'color:#888;');

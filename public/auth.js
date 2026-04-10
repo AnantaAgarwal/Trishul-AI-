@@ -1,13 +1,12 @@
 const AUTH = {
 
-    // --- CONFIG ---
     SESSION_DURATION_MS: 30 * 60 * 1000,   // 30 minutes
     ALLOWED_CREDENTIALS: {
       "commander": "trishul@2026",
       "operator":  "op_secure_99"
     },
   
-    // ─── DEVICE ID ───────────────────────────────────────────
+    
   
     getDeviceId() {
       let id = localStorage.getItem("trishul_device_id");
@@ -18,14 +17,14 @@ const AUTH = {
       return id;
     },
   
-    // ─── DEVICE REGISTRATION ─────────────────────────────────
+    
   
     registerDevice() {
       const id = this.getDeviceId();
       localStorage.setItem("trishul_registered_device", id);
     },
   
-    // ─── DEVICE AUTH CHECK ───────────────────────────────────
+    
   
     isDeviceAuthorized() {
       const current    = this.getDeviceId();
@@ -33,7 +32,7 @@ const AUTH = {
       return current === registered;
     },
   
-    // ─── SESSION CREATE ──────────────────────────────────────
+    
   
     createSession(username) {
       const token = "SESS-" + username + "-" + Date.now();
@@ -45,7 +44,6 @@ const AUTH = {
       sessionStorage.setItem("trishul_device", this.getDeviceId());
     },
   
-    // ─── SESSION VALIDATION ──────────────────────────────────
   
     isSessionValid() {
       const token    = sessionStorage.getItem("trishul_token");
@@ -60,7 +58,6 @@ const AUTH = {
       return true;
     },
   
-    // ─── LOGOUT ──────────────────────────────────────────────
   
     logout() {
       sessionStorage.clear();

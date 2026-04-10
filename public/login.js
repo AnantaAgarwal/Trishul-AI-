@@ -5,13 +5,13 @@ window.onload = function () {
   const msgBox = document.getElementById("auth-message");
   const deviceInfo = document.getElementById("device-info");
 
-  // Safety check (VERY IMPORTANT)
+  
   if (!form) {
     console.error("Login form not found!");
     return;
   }
 
-  // Show device ID
+  
   if (deviceInfo) {
     deviceInfo.textContent = "Device ID: " + AUTH.getDeviceId();
   }

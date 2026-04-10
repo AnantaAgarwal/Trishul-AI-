@@ -1,5 +1,3 @@
-// ===== RADAR SWEEP ANIMATION =====
-
 document.addEventListener("DOMContentLoaded", () => {
   createRadar("air-radar");
   createRadar("cyber-radar");
@@ -49,8 +47,7 @@ function createRadar(canvasId) {
   draw();
 }
   
-  
-  // ===== ACTION TRIGGER =====
+
   
   function triggerAction(domain, action) {
     const toast = document.getElementById("action-toast");
@@ -64,7 +61,7 @@ function createRadar(canvasId) {
   }
   
   
-  // ===== LIVE INTEGRITY FLUCTUATION =====
+
   
   setInterval(() => {
     const el = document.getElementById("integrity");
@@ -75,7 +72,7 @@ function createRadar(canvasId) {
   }, 4000);
   
   
-  // ===== FLOW STEP SIMULATION =====
+  
   
   setTimeout(() => {
     const steps = document.querySelectorAll(".flow-step");

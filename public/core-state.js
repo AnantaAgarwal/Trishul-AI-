@@ -1,5 +1,3 @@
-// ===== TRISHUL GLOBAL STATE ENGINE =====
-
 const TRISHUL_STATE = {
     air: {
       threatLevel: 75,
@@ -21,12 +19,12 @@ const TRISHUL_STATE = {
   };
   
   
-  // Save state globally
+  
   function saveState(){
     localStorage.setItem("TRISHUL_STATE", JSON.stringify(TRISHUL_STATE));
   }
   
-  // Load state
+  
   function loadState(){
     const stored = localStorage.getItem("TRISHUL_STATE");
     if(stored){
@@ -34,7 +32,7 @@ const TRISHUL_STATE = {
     }
   }
   
-  // Escalation simulation
+  
   function escalateDomain(domain, amount){
     TRISHUL_STATE[domain].threatLevel += amount;
     TRISHUL_STATE.nationalRisk += amount * 0.4;
@@ -48,7 +46,7 @@ const TRISHUL_STATE = {
     saveState();
   }
   
-  // Recalculate national risk dynamically
+  
   function recalculateRisk(){
     TRISHUL_STATE.nationalRisk = Math.round(
       (TRISHUL_STATE.air.threatLevel * 0.4) +

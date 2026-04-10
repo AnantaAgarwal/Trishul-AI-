@@ -72,7 +72,7 @@ body {
   flex: 1;
   min-height: 0;
 }
-/* ===== 3 PANEL GRID ===== */
+
 
 .domains-grid {
   display: grid;
@@ -80,7 +80,7 @@ body {
   gap: 20px;
   margin-top: 20px;
 }
-/* ===== DOMAIN PANEL FIX ===== */
+
 .domain-panel {
   min-height: 420px;
 }
@@ -127,7 +127,7 @@ body {
 .bottom-bar {
   flex-shrink: 0;
 }
-/* ===== BACKGROUND LAYER FIX ===== */
+
 
 .scanlines,
 #grid-canvas,
@@ -159,11 +159,11 @@ body {
 .domain-panel {
   background: rgba(0, 12, 20, 0.92);
 }
-/* HARD SEPARATION BETWEEN PANELS AND FLOW BAR */
+
 
 .op-flow-bar {
   position: relative;
-  background: #020a12;   /* solid dark */
+  background: #020a12;   
   border-top: 2px solid rgba(0,229,255,0.6);
   margin-top: 25px;
   padding-top: 15px;
