@@ -3,317 +3,752 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TRISHUL AI — Threat Map</title>
+<title>TRISHUL AI — Live Threat Map</title>
 
-<link rel="stylesheet" href="style.css"/>
-<link rel="stylesheet" href="dashboard.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
 
 <style>
-.map-wrapper{
+:root{
+  --cyan:#00e5ff;
+  --red:#ff2244;
+  --orange:#ff9900;
+  --yellow:#ffcc00;
+  --green:#39ff14;
+  --panel:rgba(0,8,20,0.94);
+  --border:rgba(0,229,255,0.22);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  width:100%;height:100%;
+  background:#000810;
+  color:var(--cyan);
+  font-family:'Share Tech Mono',monospace;
+  overflow:hidden;
+}
+
+/* ── SCANLINES ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.13) 2px,
+    rgba(0,0,0,0.13) 4px
+  );
+  pointer-events:none;z-index:9000;
+}
+
+/* ── ANIMATED GRID BG ── */
+#grid-canvas{
+  position:fixed;inset:0;
+  z-index:0;
+  opacity:0.18;
+}
+
+/* ── MAIN HUD ── */
+#hud{
+  position:fixed;inset:0;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── TOP BAR ── */
+#topbar{
+  height:38px;
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  flex-shrink:0;
+}
+
+.tb-brand{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.22em;
+  color:var(--cyan);
+}
+
+.blink-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);
+  animation:blink 1.1s step-end infinite;
+  box-shadow:0 0 8px var(--red);
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.tb-right{
+  display:flex;gap:24px;align-items:center;
+  font-size:0.57rem;color:#7aabb8;
+}
+
+.tb-right .val{color:var(--green)}
+.tb-right .val-red{color:var(--red)}
+
+/* ── CONTENT AREA ── */
+#content{
   flex:1;
   display:grid;
-  grid-template-columns:1fr 260px;
-  gap:10px;
-  padding:0 8px;
+  grid-template-columns:1fr 290px;
   overflow:hidden;
   min-height:0;
 }
 
-.map-area{
+/* ── MAP ── */
+#map-wrap{
   position:relative;
-  background:rgba(0,5,12,0.95);
-  border:1px solid var(--border);
+  overflow:hidden;
+  background:#000d1a;
+}
+
+#map{
+  position:absolute;inset:0;
+}
+
+/* Leaflet tile dark style */
+.leaflet-tile-pane{
+  filter:grayscale(1) brightness(0.15) sepia(1) hue-rotate(170deg) saturate(4);
+}
+
+/* Leaflet controls */
+.leaflet-bar a{
+  background:var(--panel) !important;
+  color:var(--cyan) !important;
+  border-color:var(--border) !important;
+}
+.leaflet-bar a:hover{background:rgba(0,229,255,0.15) !important}
+
+/* map label overlay */
+#map-label{
+  position:absolute;top:10px;left:12px;
+  z-index:500;
+  font-family:'Orbitron',monospace;
+  font-size:0.58rem;
+  letter-spacing:0.2em;
+  color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan);
+  pointer-events:none;
+}
+
+#map-coords{
+  position:absolute;bottom:10px;left:12px;
+  z-index:500;
+  font-size:0.52rem;
+  color:#4a7a88;
+  pointer-events:none;
+}
+
+/* Corner brackets */
+.corner{position:absolute;width:18px;height:18px;z-index:600;pointer-events:none}
+.corner.tl{top:6px;left:6px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+.corner.tr{top:6px;right:6px;border-top:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+.corner.bl{bottom:6px;left:6px;border-bottom:2px solid var(--cyan);border-left:2px solid var(--cyan)}
+.corner.br{bottom:6px;right:6px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan)}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  background:var(--panel);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
   overflow:hidden;
 }
 
-#india-canvas{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-.map-title{
-  position:absolute;
-  top:12px;
-  left:12px;
+.s-head{
+  padding:10px 14px 8px;
+  border-bottom:1px solid var(--border);
   font-family:'Orbitron',monospace;
-  font-size:0.65rem;
+  font-size:0.55rem;
+  letter-spacing:0.2em;
   color:var(--cyan);
-  letter-spacing:0.15em;
+  flex-shrink:0;
 }
 
-.map-bottom{
-  position:absolute;
-  bottom:10px;
-  left:0;
-  right:0;
-  display:flex;
-  justify-content:center;
-  gap:24px;
-}
-
-.map-stat{
-  font-family:'Share Tech Mono',monospace;
-  font-size:0.62rem;
-  color:#7aaabb;
-}
-
-.map-stat span{
-  color:var(--green);
-}
-
-sidebar{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+/* Threat list */
+#threat-list{
+  flex:1;
   overflow-y:auto;
-}
-
-.t-panel{
-  background:var(--panel-bg);
-  border:1px solid var(--border);
-  padding:12px;
-  backdrop-filter:blur(6px);
-}
-
-.t-title{
-  font-family:'Orbitron',monospace;
-  font-size:0.6rem;
-  color:var(--cyan);
-  letter-spacing:0.15em;
-  margin-bottom:8px;
-}
-
-.t-entry{
   padding:8px;
-  border:1px solid rgba(255,34,68,0.25);
-  background:rgba(40,0,10,0.5);
-  margin-bottom:6px;
-  font-family:'Share Tech Mono',monospace;
-  font-size:0.6rem;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(0,229,255,0.2) transparent;
 }
 
-.t-head{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:4px;
+.t-card{
+  padding:9px 11px;
+  border:1px solid rgba(255,34,68,0.28);
+  background:rgba(40,0,10,0.55);
+  margin-bottom:7px;
+  cursor:pointer;
+  transition:border-color 0.15s, background 0.15s;
+  position:relative;
 }
+.t-card::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  width:3px;
+  background:var(--red);
+}
+.t-card.orange::before{background:var(--orange)}
+.t-card.yellow::before{background:var(--yellow)}
 
-.t-name{color:#fff;}
+.t-card:hover,.t-card.active{
+  border-color:rgba(255,34,68,0.7);
+  background:rgba(70,0,18,0.75);
+}
+.t-card.active{border-color:var(--red)}
+
+.t-head{display:flex;justify-content:space-between;margin-bottom:4px}
+.t-name{font-size:0.6rem;color:#fff;font-weight:bold;letter-spacing:0.05em}
 .t-conf{
   font-family:'Orbitron',monospace;
-  font-size:0.65rem;
-  font-weight:700;
+  font-size:0.62rem;font-weight:700;
+}
+.conf-crit{color:var(--red)}
+.conf-high{color:var(--orange)}
+.conf-mod{color:var(--yellow)}
+
+.t-meta{font-size:0.53rem;color:#7aabb8;line-height:1.5}
+.t-target{color:#aad4dd}
+
+/* Analysis panel */
+#analysis-wrap{
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.s-head2{
+  padding:8px 14px;
+  border-bottom:1px solid var(--border);
+  font-family:'Orbitron',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.2em;
+  color:var(--cyan);
+}
+#analysis{
+  padding:10px 13px;
+  font-size:0.57rem;
+  color:#9acfdc;
+  line-height:1.75;
+  min-height:130px;
+  max-height:200px;
+  overflow-y:auto;
+}
+.a-row{margin-bottom:3px}
+.a-key{color:var(--cyan);display:inline-block;width:96px}
+.a-val{color:#fff}
+.a-action{
+  margin-top:9px;
+  padding:7px 10px;
+  border:1px solid rgba(255,34,68,0.45);
+  background:rgba(60,0,15,0.7);
+  color:#ff6688;
+  font-size:0.54rem;
+  line-height:1.5;
+}
+.a-placeholder{color:#3a6070;font-size:0.57rem;padding-top:8px}
+
+/* Legend */
+#legend{
+  border-top:1px solid var(--border);
+  padding:8px 13px;
+  flex-shrink:0;
+  display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:0.5rem;color:#7aabb8}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── BOTTOM BAR ── */
+#bottombar{
+  height:30px;
+  background:var(--panel);
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  flex-shrink:0;
+}
+.bb-l{font-size:0.52rem;color:#4a7a88}
+.bb-r{
+  font-family:'Orbitron',monospace;
+  font-size:0.52rem;
+  letter-spacing:0.12em;
+  color:var(--red);
+  animation:blink 1.4s step-end infinite;
 }
 
-.analysis-box{
-  margin-top:10px;
-  padding:10px;
-  border:1px solid rgba(0,229,255,0.3);
-  background:rgba(0,20,35,0.6);
-  font-family:'Share Tech Mono',monospace;
-  font-size:0.6rem;
-  min-height:60px;
+/* Leaflet popup */
+.leaflet-popup-content-wrapper{
+  background:rgba(0,10,25,0.97) !important;
+  border:1px solid rgba(0,229,255,0.4) !important;
+  border-radius:3px !important;
+  color:var(--cyan) !important;
+  font-family:'Share Tech Mono',monospace !important;
+  font-size:11px !important;
+  padding:0 !important;
+  box-shadow:0 0 20px rgba(0,229,255,0.15) !important;
+}
+.leaflet-popup-content{margin:10px 14px !important}
+.leaflet-popup-tip-container{display:none}
+.leaflet-popup-close-button{color:var(--cyan) !important;font-size:14px !important;right:6px !important;top:4px !important}
+
+/* City tooltip */
+.leaflet-tooltip{
+  background:rgba(0,10,25,0.9) !important;
+  border:1px solid rgba(0,229,255,0.3) !important;
+  border-radius:2px !important;
+  color:var(--cyan) !important;
+  font-family:'Orbitron',monospace !important;
+  font-size:0.5rem !important;
+  letter-spacing:0.1em !important;
+  padding:2px 6px !important;
+  white-space:nowrap !important;
+  box-shadow:none !important;
+}
+.leaflet-tooltip::before{display:none}
+
+/* Pulse animations */
+@keyframes pulseRed{
+  0%{box-shadow:0 0 0 0 rgba(255,34,68,0.9)}
+  70%{box-shadow:0 0 0 14px rgba(255,34,68,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,34,68,0)}
+}
+@keyframes pulseOrange{
+  0%{box-shadow:0 0 0 0 rgba(255,153,0,0.9)}
+  70%{box-shadow:0 0 0 14px rgba(255,153,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,153,0,0)}
+}
+@keyframes pulseYellow{
+  0%{box-shadow:0 0 0 0 rgba(255,204,0,0.9)}
+  70%{box-shadow:0 0 0 14px rgba(255,204,0,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}
+}
+.pulse-red{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--red);
+  border:1px solid rgba(255,80,100,0.8);
+  animation:pulseRed 1.2s infinite;
+  cursor:pointer;
+}
+.pulse-orange{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--orange);
+  border:1px solid rgba(255,170,50,0.8);
+  animation:pulseOrange 1.5s infinite;
+  cursor:pointer;
+}
+.pulse-yellow{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--yellow);
+  border:1px solid rgba(255,220,80,0.8);
+  animation:pulseYellow 1.8s infinite;
+  cursor:pointer;
+}
+.city-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(0,229,255,0.35);
+  border:2px solid var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
 }
 </style>
 </head>
-
 <body>
 
-<div class="scanlines"></div>
 <canvas id="grid-canvas"></canvas>
-<div class="particles" id="particles"></div>
 
-<div class="hud-frame">
+<div id="hud">
 
-<div class="top-bar">
-  <div class="top-left">
-    <span class="blink-dot"></span>
-    <span class="mono">TRISHUL AI // LIVE THREAT MAP</span>
-  </div>
-  <div class="top-right">
-    <span class="mono small">TIME: <span id="clock">--:--:--</span> IST</span>
-  </div>
-</div>
-
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
-
-<div class="map-wrapper">
-
-<div class="map-area">
-  <canvas id="india-canvas"></canvas>
-  <div class="map-title">LIVE GEOSPATIAL THREAT VISUALIZATION</div>
-
-  <div class="map-bottom">
-    <div class="map-stat">SYSTEM INTEGRITY: <span>100%</span></div>
-    <div class="map-stat">NETWORK: <span>SECURE</span></div>
-    <div class="map-stat">THREATS: <span id="active-count">2 ACTIVE</span></div>
-  </div>
-</div>
-
-<div class="threat-sidebar">
-  <div class="t-panel">
-    <div class="t-title">THREAT ANALYSIS</div>
-    <div id="analysis-output" class="analysis-box">
-      CLICK A THREAT VECTOR TO VIEW ANALYSIS.
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="tb-brand">
+      <span class="blink-dot"></span>
+      TRISHUL AI &nbsp;//&nbsp; LIVE THREAT VISUALIZATION
+    </div>
+    <div class="tb-right">
+      <span>TIME: <span class="val" id="clock">--:--:--</span> IST</span>
+      <span>THREATS: <span class="val-red" id="threat-count">—</span></span>
+      <span>NETWORK: <span class="val">SECURE</span></span>
+      <span>INTEGRITY: <span class="val">100%</span></span>
     </div>
   </div>
-</div>
+
+  <!-- CONTENT -->
+  <div id="content">
+
+    <!-- MAP -->
+    <div id="map-wrap">
+      <div id="map"></div>
+      <div id="map-label">LIVE GEOSPATIAL THREAT VISUALIZATION — INDIA THEATRE</div>
+      <div id="map-coords">LAT: <span id="cur-lat">--</span> &nbsp; LNG: <span id="cur-lng">--</span></div>
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <div class="s-head">ACTIVE THREAT VECTORS</div>
+      <div id="threat-list"></div>
+
+      <div id="analysis-wrap">
+        <div class="s-head2">THREAT ANALYSIS</div>
+        <div id="analysis">
+          <div class="a-placeholder">▶️ SELECT A THREAT VECTOR TO VIEW DETAILED ANALYSIS</div>
+        </div>
+      </div>
+
+      <div id="legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>CRITICAL</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--orange)"></div>HIGH</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--yellow)"></div>MODERATE</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--cyan)"></div>CITY</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottombar">
+    <div class="bb-l">TRISHUL AI &nbsp;// &nbsp;TEAM 2BYTES &nbsp;|&nbsp; CLASSIFIED — RESTRICTED ACCESS</div>
+    <div class="bb-r">⚠ ACTIVE DEFENSE MODE</div>
+  </div>
 
 </div>
-
-<div class="bottom-bar">
-  <div class="mono small">TRISHUL AI // TEAM 2BYTES</div>
-  <div class="mono small red blink-text">⚠ ACTIVE DEFENSE MODE</div>
-</div>
-
-</div>
-
-
 
 <script>
-// Clock
+/* ── GRID BG ── */
+(function(){
+  const c=document.getElementById('grid-canvas');
+  const ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.strokeStyle='rgba(0,180,220,0.4)';
+    ctx.lineWidth=0.5;
+    const step=40;
+    for(let x=0;x<c.width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,c.height);ctx.stroke();}
+    for(let y=0;y<c.height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(c.width,y);ctx.stroke();}
+  }
+  draw();
+  window.addEventListener('resize',draw);
+})();
+
+/* ── CLOCK ── */
 function updateClock(){
-  const now=new Date();
-  const t=[now.getHours(),now.getMinutes(),now.getSeconds()]
-  .map(v=>String(v).padStart(2,'0')).join(':');
-  document.getElementById('clock').textContent=t;
+  const n=new Date();
+  document.getElementById('clock').textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(v=>String(v).padStart(2,'0')).join(':');
 }
-setInterval(updateClock,1000);
-updateClock();
+setInterval(updateClock,1000);updateClock();
 
-const canvas=document.getElementById('india-canvas');
-const ctx=canvas.getContext('2d');
+/* ── CITIES ── */
+const CITIES={
+  delhi:     {lat:28.6139,lng:77.2090,name:'NEW DELHI'},
+  mumbai:    {lat:19.0760,lng:72.8777,name:'MUMBAI'},
+  amritsar:  {lat:31.6340,lng:74.8723,name:'AMRITSAR'},
+  srinagar:  {lat:34.0837,lng:74.7973,name:'SRINAGAR'},
+  leh:       {lat:34.1526,lng:77.5771,name:'LEH'},
+  jaisalmer: {lat:26.9157,lng:70.9083,name:'JAISALMER'},
+  kolkata:   {lat:22.5726,lng:88.3639,name:'KOLKATA'},
+  chennai:   {lat:13.0827,lng:80.2707,name:'CHENNAI'},
+  hyderabad: {lat:17.3850,lng:78.4867,name:'HYDERABAD'},
+  bangalore: {lat:12.9716,lng:77.5946,name:'BANGALORE'},
+  pune:      {lat:18.5204,lng:73.8567,name:'PUNE'},
+  visakhapatnam:{lat:17.6868,lng:83.2185,name:'VISAKHAPATNAM'},
+  bhopal:    {lat:23.2599,lng:77.4126,name:'BHOPAL'},
+  chandigarh:{lat:30.7333,lng:76.7794,name:'CHANDIGARH'},
+  patna:     {lat:25.5941,lng:85.1376,name:'PATNA'},
+  guwahati:  {lat:26.1445,lng:91.7362,name:'GUWAHATI'},
+  kochi:     {lat:9.9312,lng:76.2673,name:'KOCHI'},
+};
 
-function resize(){
-  canvas.width=canvas.offsetWidth;
-  canvas.height=canvas.offsetHeight;
-}
-resize();
-window.addEventListener('resize',resize);
-
-const cities=[
-  [0.48,0.22,'DELHI'],
-  [0.32,0.58,'MUMBAI']
+/* ── INIT THREATS ── */
+const THREATS_INIT=[
+  {
+    id:'T-001',name:'DRONE SWARM',type:'drone',
+    origin:{lat:31.55,lng:73.10,label:'PAK BORDER — LAHORE SECTOR'},
+    target:'amritsar',
+    color:'#ff2244',cls:'pulse-red',cardCls:'',
+    confidence:98,status:'CRITICAL',
+    action:'SCRAMBLE IAF INTERCEPTORS — DEPLOY ANTI-DRONE NET SECTOR 7\nACTIVATE AESA RADAR LOCK'
+  },
+  {
+    id:'T-002',name:'CYBER INTRUSION',type:'cyber',
+    origin:{lat:33.7,lng:73.1,label:'POK — RAWALPINDI CYBER CELL'},
+    target:'delhi',
+    color:'#ff2244',cls:'pulse-red',cardCls:'',
+    confidence:95,status:'CRITICAL',
+    action:'ISOLATE ERNET SEGMENT B-7\nACTIVATE FIREWALL ALPHA — CERT-IN NOTIFIED'
+  },
+  {
+    id:'T-003',name:'BALLISTIC VECTOR',type:'missile',
+    origin:{lat:34.5,lng:73.4,label:'POK — MUZAFFARABAD LAUNCH SITE'},
+    target:'srinagar',
+    color:'#ff9900',cls:'pulse-orange',cardCls:'orange',
+    confidence:89,status:'HIGH',
+    action:'ACTIVATE S-400 BATTERY — NORTHERN SHIELD\nBRAKMOS BATTERY ON STANDBY'
+  },
+  {
+    id:'T-004',name:'NAVAL INCURSION',type:'naval',
+    origin:{lat:20.5,lng:65.2,label:'ARABIAN SEA — UNIDENTIFIED VESSEL'},
+    target:'mumbai',
+    color:'#ff9900',cls:'pulse-orange',cardCls:'orange',
+    confidence:82,status:'HIGH',
+    action:'INS VIKRAMADITYA — INTERCEPT COURSE SET\nP-8I POSEIDON DEPLOYED'
+  },
+  {
+    id:'T-005',name:'SIGNAL INTRUSION',type:'sigint',
+    origin:{lat:23.7,lng:90.5,label:'DHAKA-ALIGNED NODE — BAY OF BENGAL'},
+    target:'kolkata',
+    color:'#ffcc00',cls:'pulse-yellow',cardCls:'yellow',
+    confidence:73,status:'MODERATE',
+    action:'SIGINT SWEEP INITIATED — NSA BRANCH 4\nMONITOR AND LOG'
+  },
+  {
+    id:'T-006',name:'AIR INCURSION',type:'drone',
+    origin:{lat:35.5,lng:79.5,label:'AKSAI CHIN — PLA FORWARD BASE'},
+    target:'leh',
+    color:'#ff9900',cls:'pulse-orange',cardCls:'orange',
+    confidence:85,status:'HIGH',
+    action:'IAF LADAKH BASE ON SCRAMBLE ALERT\nSU-30MKI PAIR AIRBORNE'
+  },
 ];
 
-let threats=[
-  {start:[0.05,0.08],target:0,color:'#ff2244',name:'DRONE SWARM',confidence:98},
-  {start:[0.02,0.65],target:1,color:'#ff2244',name:'CYBER BREACH',confidence:94}
-];
-
-let progress=[0,0.4];
-let pulseTime=0;
-
-function updateThreatCount(){
-  document.getElementById("active-count").textContent=
-  threats.length+" ACTIVE";
-}
-updateThreatCount();
-
-function draw(){
-  const w=canvas.width;
-  const h=canvas.height;
-  ctx.clearRect(0,0,w,h);
-
-  ctx.fillStyle='rgba(0,8,18,0.95)';
-  ctx.fillRect(0,0,w,h);
-
-  const mx=w*0.1,my=h*0.05;
-  const mw=w*0.7,mh=h*0.9;
-
-  // Cities
-  cities.forEach(c=>{
-    const x=mx+c[0]*mw;
-    const y=my+c[1]*mh;
-    ctx.beginPath();
-    ctx.arc(x,y,6,0,Math.PI*2);
-    ctx.fillStyle='#00e5ff';
-    ctx.shadowColor='#00e5ff';
-    ctx.shadowBlur=10;
-    ctx.fill();
-    ctx.shadowBlur=0;
-  });
-
-  // Threat vectors
-  threats.forEach((t,i)=>{
-    progress[i]=(progress[i]+0.002)%1;
-
-    const sx=t.start[0]*w;
-    const sy=t.start[1]*h;
-    const target=cities[t.target];
-    const ex=mx+target[0]*mw;
-    const ey=my+target[1]*mh;
-
-    ctx.strokeStyle=t.color;
-    ctx.globalAlpha=0.4;
-    ctx.beginPath();
-    ctx.moveTo(sx,sy);
-    ctx.lineTo(ex,ey);
-    ctx.stroke();
-    ctx.globalAlpha=1;
-
-    const cx=sx+(ex-sx)*progress[i];
-    const cy=sy+(ey-sy)*progress[i];
-
-    ctx.beginPath();
-    ctx.arc(cx,cy,5,0,Math.PI*2);
-    ctx.fillStyle=t.color;
-    ctx.shadowColor=t.color;
-    ctx.shadowBlur=15;
-    ctx.fill();
-    ctx.shadowBlur=0;
-  });
-
-  pulseTime+=0.03;
-  requestAnimationFrame(draw);
-}
-draw();
-
-// Threat click interaction
-canvas.addEventListener("click",(e)=>{
-  const rect=canvas.getBoundingClientRect();
-  const x=e.clientX-rect.left;
-  const y=e.clientY-rect.top;
-
-  threats.forEach((t,i)=>{
-    const target=cities[t.target];
-    const mx=canvas.width*0.1;
-    const my=canvas.height*0.05;
-    const mw=canvas.width*0.7;
-    const mh=canvas.height*0.9;
-    const ex=mx+target[0]*mw;
-    const ey=my+target[1]*mh;
-
-    if(Math.hypot(x-ex,y-ey)<20){
-      document.getElementById("analysis-output").innerHTML=
-      "THREAT: "+t.name+"<br>"+
-      "CONFIDENCE: "+t.confidence+"%<br>"+
-      "IMPACT ZONE: "+cities[t.target][2]+"<br>"+
-      "RECOMMENDED ACTION: DEPLOY COUNTERMEASURES";
-    }
-  });
+/* ── MAP ── */
+const map=L.map('map',{
+  center:[23.5,82.0],
+  zoom:5,
+  zoomControl:false,
+  attributionControl:false,
+  maxZoom:10,minZoom:4
 });
 
-// Simulate escalation
-setInterval(()=>{
-  threats.push({
-    start:[Math.random()*0.1,Math.random()],
-    target:0,
-    color:'#ffaa00',
-    name:'NEW VECTOR',
-    confidence:87
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.control.attribution({position:'bottomleft',prefix:'<span style="color:#2a5060;font-size:9px">OSM</span>'}).addTo(map);
+
+/* ── INDIA BOUNDARIES via GeoJSON ── */
+// Fetch India + states outline from a public CDN
+fetch('https://cdn.jsdelivr.net/npm/india-geojson@1.0.1/india.geo.json')
+  .then(r=>r.json())
+  .then(data=>{
+    L.geoJSON(data,{
+      style:{
+        color:'rgba(0,229,255,0.55)',
+        weight:1.2,
+        fillColor:'rgba(0,40,60,0.18)',
+        fillOpacity:1,
+        dashArray:null
+      }
+    }).addTo(map);
+  })
+  .catch(()=>{
+    // fallback: draw simplified border box over India
+    console.warn('GeoJSON load failed — using fallback');
   });
-  progress.push(Math.random());
-  updateThreatCount();
-},20000);
 
+// Also load state boundaries
+fetch('https://cdn.jsdelivr.net/npm/india-geojson@1.0.1/states.geo.json')
+  .then(r=>r.json())
+  .then(data=>{
+    L.geoJSON(data,{
+      style:{
+        color:'rgba(0,180,200,0.28)',
+        weight:0.6,
+        fillColor:'transparent',
+        fillOpacity:0,
+        dashArray:'3,4'
+      },
+      onEachFeature:(feature,layer)=>{
+        if(feature.properties && feature.properties.NAME_1){
+          layer.bindTooltip(
+            `<span style="font-family:'Orbitron',monospace;font-size:9px;color:#00e5ff;letter-spacing:0.1em">${feature.properties.NAME_1.toUpperCase()}</span>`,
+            {permanent:false,direction:'center',className:''}
+          );
+        }
+      }
+    }).addTo(map);
+  })
+  .catch(()=>{
+    console.warn('State GeoJSON load failed');
+  });
+
+/* ── COORDINATE DISPLAY ── */
+map.on('mousemove',e=>{
+  document.getElementById('cur-lat').textContent=e.latlng.lat.toFixed(3);
+  document.getElementById('cur-lng').textContent=e.latlng.lng.toFixed(3);
+});
+
+/* ── CITY MARKERS ── */
+function cityIcon(){
+  const el=document.createElement('div');
+  el.className='city-dot';
+  return L.divIcon({className:'',html:el.outerHTML,iconSize:[8,8],iconAnchor:[4,4]});
+}
+
+Object.entries(CITIES).forEach(([key,c])=>{
+  L.marker([c.lat,c.lng],{icon:cityIcon(),zIndexOffset:-100})
+    .bindTooltip(c.name,{permanent:false,direction:'top',offset:[0,-8]})
+    .addTo(map);
+});
+
+/* ── THREAT RENDERING ── */
+const threatLayers={};
+let currentThreats=[...THREATS_INIT];
+let activeId=null;
+
+function confClass(conf){
+  if(conf>=90)return 'conf-crit';
+  if(conf>=75)return 'conf-high';
+  return 'conf-mod';
+}
+
+function pulseIcon(cls){
+  const el=document.createElement('div');
+  el.className=cls;
+  return L.divIcon({className:'',html:el.outerHTML,iconSize:[12,12],iconAnchor:[6,6]});
+}
+
+function removeThreatLayer(id){
+  if(threatLayers[id]){
+    threatLayers[id].forEach(l=>map.removeLayer(l));
+    delete threatLayers[id];
+  }
+}
+
+function addThreatToMap(t){
+  removeThreatLayer(t.id);
+  const tgt=CITIES[t.target];
+  const layers=[];
+
+  // Dashed threat line
+  const line=L.polyline(
+    [[t.origin.lat,t.origin.lng],[tgt.lat,tgt.lng]],
+    {color:t.color,weight:1.5,opacity:0.55,dashArray:'7,5'}
+  ).addTo(map);
+  layers.push(line);
+
+  // Arrow head at midpoint
+  const midLat=(t.origin.lat+tgt.lat)/2;
+  const midLng=(t.origin.lng+tgt.lng)/2;
+
+  // Origin pulse marker
+  const mk=L.marker([t.origin.lat,t.origin.lng],{icon:pulseIcon(t.cls),zIndexOffset:100});
+  mk.bindPopup(`
+    <div style="line-height:1.7">
+      <div style="color:#ff4466;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:0.1em;margin-bottom:4px">${t.name}</div>
+      <div style="color:#aad4dd;font-size:10px">ORIGIN: ${t.origin.label}</div>
+      <div style="color:#aad4dd;font-size:10px">TARGET: ${tgt.name}</div>
+      <div style="color:${t.color};font-size:10px">CONF: ${t.confidence}% — ${t.status}</div>
+    </div>
+  `,{closeButton:true,maxWidth:240});
+  mk.on('click',()=>selectThreat(t.id));
+  mk.addTo(map);
+  layers.push(mk);
+
+  // Moving dot along line (animated via repeated remove/add)
+  threatLayers[t.id]=layers;
+}
+
+function renderAll(){
+  currentThreats.forEach(t=>addThreatToMap(t));
+  renderList();
+  document.getElementById('threat-count').textContent=currentThreats.length+' ACTIVE';
+}
+
+function renderList(){
+  const list=document.getElementById('threat-list');
+  list.innerHTML='';
+  currentThreats.forEach(t=>{
+    const tgt=CITIES[t.target];
+    const card=document.createElement('div');
+    card.className='t-card'+(t.cardCls?' '+t.cardCls:'')+(activeId===t.id?' active':'');
+    card.id='tc-'+t.id;
+    card.innerHTML=`
+      <div class="t-head">
+        <span class="t-name">${t.name}</span>
+        <span class="t-conf ${confClass(t.confidence)}">${t.confidence}%</span>
+      </div>
+      <div class="t-meta">
+        ID: ${t.id} &nbsp;|&nbsp; ${t.status}<br>
+        → <span class="t-target">${tgt.name}</span>
+      </div>
+    `;
+    card.onclick=()=>selectThreat(t.id);
+    list.appendChild(card);
+  });
+}
+
+function selectThreat(id){
+  activeId=id;
+  const t=currentThreats.find(x=>x.id===id);
+  if(!t)return;
+
+  // Update card highlights
+  document.querySelectorAll('.t-card').forEach(c=>{
+    c.classList.toggle('active',c.id==='tc-'+id);
+  });
+
+  // Fly map
+  const tgt=CITIES[t.target];
+  map.flyTo(
+    [(t.origin.lat+tgt.lat)/2,(t.origin.lng+tgt.lng)/2],
+    6,{duration:1.3,easeLinearity:0.5}
+  );
+
+  // Show analysis
+  const actionLines=t.action.split('\n').map(l=>`<div>▶️ ${l}</div>`).join('');
+  document.getElementById('analysis').innerHTML=`
+    <div class="a-row"><span class="a-key">THREAT ID</span><span class="a-val">${t.id}</span></div>
+    <div class="a-row"><span class="a-key">TYPE</span><span class="a-val">${t.name}</span></div>
+    <div class="a-row"><span class="a-key">ORIGIN</span><span class="a-val">${t.origin.label}</span></div>
+    <div class="a-row"><span class="a-key">TARGET</span><span class="a-val">${CITIES[t.target].name}</span></div>
+    <div class="a-row"><span class="a-key">CONFIDENCE</span><span class="a-val" style="color:${t.color}">${t.confidence}%</span></div>
+    <div class="a-row"><span class="a-key">STATUS</span><span class="a-val" style="color:${t.color}">${t.status}</span></div>
+    <div class="a-action">${actionLines}</div>
+  `;
+}
+
+renderAll();
+
+/* ── AUTO-ESCALATION every 30s ── */
+const newThreatTemplates=[
+  {name:'EW JAMMING',type:'ew',target:'chandigarh',status:'MODERATE',conf:71,cardCls:'yellow',cls:'pulse-yellow',color:'#ffcc00',action:'ACTIVATE ECM COUNTERMEASURES\nSIGINT ALERT LEVEL 2'},
+  {name:'SUB CONTACT',type:'naval',target:'visakhapatnam',status:'HIGH',conf:84,cardCls:'orange',cls:'pulse-orange',color:'#ff9900',action:'INS CHAKRA ON INTERCEPT\nSONAR SWEEP AUTHORIZED'},
+  {name:'INFILTRATION',type:'ground',target:'patna',status:'MODERATE',conf:68,cardCls:'yellow',cls:'pulse-yellow',color:'#ffcc00',action:'SECTOR PATROL ACTIVATED\nRAW FIELD UNIT ALERTED'},
+];
+let nIdx=0;
+setInterval(()=>{
+  const tmpl=newThreatTemplates[nIdx%newThreatTemplates.length];nIdx++;
+  const tgt=CITIES[tmpl.target];
+  const t={
+    id:'T-'+(100+currentThreats.length),
+    name:tmpl.name,type:tmpl.type,
+    origin:{
+      lat:tgt.lat+(Math.random()-0.5)*12,
+      lng:tgt.lng+(Math.random()-0.5)*12,
+      label:'UNIDENTIFIED NODE — AUTO-DETECTED'
+    },
+    target:tmpl.target,
+    color:tmpl.color,cls:tmpl.cls,cardCls:tmpl.cardCls,
+    confidence:tmpl.conf,status:tmpl.status,action:tmpl.action
+  };
+  currentThreats.push(t);
+  addThreatToMap(t);
+  renderList();
+  document.getElementById('threat-count').textContent=currentThreats.length+' ACTIVE';
+},30000);
 </script>
-
 </body>
 </html>
