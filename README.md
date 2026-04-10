@@ -9,176 +9,190 @@
 </p>
 
 <h1 align="center" style="color:#00e5ff;">
-TRISHUL AI
+🔱 TRISHUL AI
 </h1>
 
 <p align="center">
-Unified Multi-Domain Defense Intelligence System  
-AI-Powered Threat Detection • Real-Time Visualization • Explainable AI
+<b>The Sovereign Multi-Domain Defense Intelligence Engine</b><br>
+Predictive Threat Analysis • Real-Time Command Interface • Explainable Intelligence
 </p>
 
 ---
 
-# 🧠 Overview
+# Strategic Overview
 
-**TRISHUL AI** is an advanced, multi-domain operational defense dashboard designed to simulate real-time threat monitoring across:
+**TRISHUL AI** is a next-generation defense intelligence simulation platform designed to eliminate the **"Fog of War"** by unifying fragmented operational domains into a single, coherent decision system.
 
-- ✈ Air Defense  
-- 🔒 Cyber Security  
-- 📡 Electronic Warfare  
+Modern threat environments operate at extreme speed and complexity. TRISHUL addresses this by integrating:
 
-The system integrates AI-driven analysis, geospatial threat mapping, and explainable intelligence outputs into a single unified command interface.
+- ✈ **Air Defense Intelligence**
+- 🔒 **Cyber Threat Monitoring**
+- 📡 **Electronic Warfare Analysis**
+
+into a **real-time, AI-driven command interface**.
 
 ---
 
-# 🌌 Landing Interface
+# ⚡ The Core Problem
+
+In conventional systems, intelligence exists in silos:
+
+- Radar systems track movement  
+- Cyber systems detect intrusions  
+- Signal systems monitor spectrum  
+
+These systems rarely communicate in real time.
+> The result: delayed correlation, slower decisions, and missed response windows.
+
+---
+
+# 🛡️ The TRIDENT Framework
+
+TRISHUL AI operates on a **three-pronged architecture**, unified through a central intelligence layer.
+
+---
+
+## 🛰️ 1. Geospatial Kinetic Defense (Air)
 
 <p align="center">
-  <img width="1440" height="777" alt="Screenshot 2026-02-21 at 12 15 26 PM" src="https://github.com/user-attachments/assets/c26e2f39-7955-491d-ba20-0c1874614c8d" />
-
+  <img width="1427" height="705" alt="Screenshot 2026-04-11 at 4 47 50 AM" src="https://github.com/user-attachments/assets/6e114b2d-8a40-458b-b68e-b5d155ebb924" />
 
 </p>
 
-The landing interface simulates a secure military-grade AI system initialization workflow including:
-
-- System boot sequence
-- Secure authentication layer
-- Operational mode activation
-- Live system clock & HUD animation
+- Real-time threat vector visualization  
+- Multi-origin attack simulation  
+- Predictive trajectory modeling  
+- City-level impact estimation  
 
 ---
 
-# 🗺️ Threat Map Module
+## 🔒 2. Deep Cyber Intelligence (Cyber)
+
+- Detection of anomalous system behavior  
+- Simulated intrusion and attack patterns  
+- Cross-domain correlation with physical threats  
+- Pre-attack signal identification  
+
+---
+
+## 📡 3. Spectrum Dominance (Electronic Warfare)
+
+- Signal pattern recognition  
+- Frequency disruption simulation  
+- Communication integrity monitoring  
+- Adaptive countermeasure modeling  
+
+---
+
+# 🌌 Command Interface
 
 <p align="center">
-  <img width="1440" height="777" alt="Screenshot 2026-02-21 at 12 16 46 PM" src="https://github.com/user-attachments/assets/fb061cc9-0e9a-46cb-a1df-34c2fc8f0e1b" />
-
+  <img width="1440" src="https://github.com/user-attachments/assets/c26e2f39-7955-491d-ba20-0c1874614c8d" />
 </p>
 
-### 🌍 Google Maps API Integrated
+The system interface is designed as a **military-grade HUD**, simulating:
 
-The Threat Map module leverages:
-
-- Google Maps API
-- Real-time threat vector plotting
-- Multi-origin attack simulation
-- Animated trajectory visualization
-- City-level impact prediction
-
-### Features
-
-- Geospatial threat detection
-- Vector-based missile/drone simulation
-- Click-to-analyze impact zones
-- Live threat escalation simulation
-- Active threat counter tracking
+- Secure system initialization  
+- Authentication workflow  
+- Operational activation sequence  
+- Real-time system telemetry  
 
 ---
 
-# 🧠 XAI Module — Explainable AI
+# 🧠 Explainable AI (XAI) Layer
 
-The **XAI (Explainable AI)** layer integrates:
+TRISHUL moves beyond opaque AI outputs.
 
-> ChatGPT API for natural-language threat reasoning
+It integrates an **Explainable Intelligence Engine** powered by:
+
+- Natural language reasoning (LLM-based)
+- Context-aware threat explanation
+- Decision transparency
 
 ### Capabilities
 
-- Converts AI predictions into human-readable explanations
-- Provides impact probability reasoning
-- Suggests recommended countermeasures
-- Interprets risk heatmaps
-
-Example Output:
-
-<img width="263" height="126" alt="Screenshot 2026-02-21 at 12 18 47 PM" src="https://github.com/user-attachments/assets/e4e9b41a-0436-4488-bcd7-9c77a615f01c" />
-
+- Converts predictions into actionable explanations  
+- Provides probability-based reasoning  
+- Suggests countermeasures  
+- Interprets threat heatmaps  
 
 ---
 
-# 🛡️ Core Architecture 
+# 🏗️ System Architecture
 
-<img width="962" height="599" alt="Screenshot 2026-02-21 at 12 23 14 PM" src="https://github.com/user-attachments/assets/20d4d869-d12f-4079-8743-b241b9fdeb87" />
-
----
+<img width="872" height="604" alt=" - visual selection-6" src="https://github.com/user-attachments/assets/8659b76e-01c1-4f01-9dc4-20cf6b2b6b7a" />
 
 
-### System Flow
+### Operational Flow
 
-1. Sensor Data Simulation
-2. Pattern Recognition Engine
-3. Threat Classification
-4. Probability Estimation
-5. Explainability Generation (ChatGPT API)
-6. Countermeasure Deployment Simulation
+1. Sensor Data Simulation  
+2. Pattern Recognition Engine  
+3. Threat Classification  
+4. Risk & Probability Estimation  
+5. Explainable AI Processing  
+6. Countermeasure Simulation  
 
 ---
 
-# ⚙️ Tech Stack
+# ⚙️ Technology Stack
 
 ### Frontend
-- HTML5
-- CSS3 (Advanced HUD UI)
-- Vanilla JavaScript
-- Canvas API (Radar & Animations)
+- HTML5  
+- CSS3 (HUD-based UI Design)  
+- JavaScript (Vanilla)  
+- Canvas API (Radar & Motion Simulation)  
 
-### AI & APIs
-- ChatGPT API (Explainable AI Module)
-- Google Maps API (Threat Mapping)
+### Intelligence Layer
+- LLM-based Explainability Engine  
+- Pattern Simulation Algorithms  
+
+### APIs
+- Google Maps API (Geospatial Intelligence)  
 
 ### Deployment
-- Firebase Hosting
+- Firebase Hosting  
 
 ---
 
-# 🚀 Live Demo
+# 🚀 Live Deployment
 
 🔗 https://trishul-ai-e93cc.web.app
 
 ---
 
-# 🔐 Security Simulation Features
+# 🔐 Simulated Capabilities
 
-- Multi-domain threat monitoring
-- Cyber intrusion detection simulation
-- Electronic spectrum jamming simulation
-- Air swarm interception modeling
-- Real-time radar sweep animation
-
----
-
-# 🎯 Key Highlights
-
-✔ Military-grade dark HUD interface  
-✔ Real-time radar simulation  
-✔ Multi-domain integration  
-✔ Explainable AI (XAI)  
-✔ Google Maps geospatial visualization  
-✔ Modular architecture  
-✔ Firebase production deployment  
+- Multi-domain threat fusion  
+- Real-time radar sweep visualization  
+- Cyber intrusion pattern simulation  
+- Air threat trajectory tracking  
+- Electronic signal disruption modeling  
 
 ---
 
+# 🎯 Key Differentiators
+
+✔ Unified multi-domain intelligence  
+✔ Real-time interactive visualization  
+✔ Explainable AI integration  
+✔ High-fidelity defense simulation  
+✔ Modular and scalable architecture  
+✔ Production deployment ready  
 
 ---
 
-# 🧩 Future Scope
+# 🧩 Future Evolution
 
-- Live data ingestion via defense-grade APIs
-- Multi-user command interface
-- Role-based secure authentication
-- Real-time drone detection integration
-- Satellite feed overlays
-- Edge-device AI deployment
-
----
-
-# ⚠️ Disclaimer
-
-This project is a defense simulation prototype built for research, academic, and hackathon purposes only.
+- Real-time data ingestion pipelines  
+- Edge AI for low-latency processing  
+- Multi-user command system  
+- Secure role-based authentication  
+- Satellite data integration  
+- Autonomous response systems  
 
 ---
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/TRISHUL-AI-00e5ff?style=for-the-badge" />
 </p>
-
